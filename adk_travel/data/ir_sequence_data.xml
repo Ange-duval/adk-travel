@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data noupdate="1">
+		<record id="seq_travel_trip" model="ir.sequence">
+			<field name="name">Séquence Voyage</field>
+			<field name="code">adk.travel.trip</field>
+			<field name="prefix">VOY/%(year)s/</field>
+			<field name="padding">5</field>
+			<field name="company_id" eval="False"/>
+			<field name="number_next">1</field>
+			<field name="number_increment">1</field>
+		</record>
+		<record id="seq_travel_booking" model="ir.sequence">
+			<field name="name">Séquence Vente / Réservation</field>
+			<field name="code">adk.travel.booking</field>
+			<field name="prefix">VTE/%(year)s/</field>
+			<field name="padding">5</field>
+			<field name="company_id" eval="False"/>
+			<field name="number_next">1</field>
+			<field name="number_increment">1</field>
+		</record>
+		<record id="seq_travel_ticket" model="ir.sequence">
+			<field name="name">Séquence Billet</field>
+			<field name="code">adk.travel.ticket</field>
+			<field name="prefix">TCK/%(year)s/</field>
+			<field name="padding">6</field>
+			<field name="company_id" eval="False"/>
+			<field name="number_next">1</field>
+			<field name="number_increment">1</field>
+		</record>
+		<record id="seq_travel_cash_closing" model="ir.sequence">
+			<field name="name">Séquence Clôture de Caisse</field>
+			<field name="code">adk.travel.cash.closing</field>
+			<field name="prefix">CLO/%(year)s/</field>
+			<field name="padding">5</field>
+			<field name="company_id" eval="False"/>
+			<field name="number_next">1</field>
+			<field name="number_increment">1</field>
+		</record>
+		<record id="seq_traval_maintenance" model="ir.sequence">
+			<field name="name">Séquence Maintenance ADK Traval</field>
+			<field name="code">adk.traval.maintenance</field>
+			<field name="prefix">MNT/%(year)s/</field>
+			<field name="padding">5</field>
+			<field name="company_id" eval="False"/>
+			<field name="number_next">1</field>
+			<field name="number_increment">1</field>
+		</record>
+	</data>
+</odoo>

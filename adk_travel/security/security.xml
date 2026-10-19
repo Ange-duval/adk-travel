@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<!-- Catégorie module -->
+	<record id="module_category_travel" model="ir.module.category">
+		<field name="name">ADK Agency Travel</field>
+		<field name="description">Contrôle d'accès pour la gestion des agences de voyage</field>
+		<field name="sequence">11</field>
+	</record>
+
+	<!-- Groupe Chauffeur : consultation de ses propres voyages / véhicules -->
+	<record id="group_travel_chauffeur" model="res.groups">
+		<field name="name">Chauffeur</field>
+		<field name="category_id" ref="module_category_travel"/>
+		<field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+		<field name="comment">Consulte ses voyages et le véhicule qui lui est assigné.</field>
+	</record>
+
+	<!-- Groupe Guichetière : vente, guichet, tickets -->
+	<record id="group_travel_user" model="res.groups">
+		<field name="name">Guichetière / Guichetier</field>
+		<field name="category_id" ref="module_category_travel"/>
+		<field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+		<field name="comment">Peut enregistrer des clients, vendre des billets et imprimer les tickets. Ne peut pas supprimer.</field>
+	</record>
+
+	<!-- Groupe Chef d'agence : gestion complète métier -->
+	<record id="group_travel_manager" model="res.groups">
+		<field name="name">Chef d'agence</field>
+		<field name="category_id" ref="module_category_travel"/>
+		<field name="implied_ids" eval="[(4, ref('group_travel_user')), (4, ref('account.group_account_invoice'))]"/>
+		<field name="comment">Gère l'équipe, la flotte, les voyages, les clôtures de caisse et les rapports.</field>
+	</record>
+
+	<!-- Groupe Administrateur : accès complet + paramétrage -->
+	<record id="group_travel_admin" model="res.groups">
+		<field name="name">Administrateur Agence</field>
+		<field name="category_id" ref="module_category_travel"/>
+		<field name="implied_ids" eval="[(4, ref('group_travel_manager'))]"/>
+		<field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+		<field name="comment">Accès complet à tous les paramètres de l'agence.</field>
+	</record>
+
+	<!-- Groupe Technicien Maintenance : déclare/suit les pannes et entretiens -->
+	<record id="group_traval_maintenance_user" model="res.groups">
+		<field name="name">Technicien / Suivi Maintenance</field>
+		<field name="category_id" ref="module_category_travel"/>
+		<field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+		<field name="comment">Déclare les pannes/entretiens et suit les interventions sur la flotte.</field>
+	</record>
+
+	<!-- Règle : un chauffeur ne voit que ses propres voyages -->
+	<record id="rule_travel_trip_chauffeur" model="ir.rule">
+		<field name="name">Chauffeur : ses voyages uniquement</field>
+		<field name="model_id" ref="model_adk_travel_trip"/>
+		<field name="domain_force">[('driver_id.user_id', '=', user.id)]</field>
+		<field name="groups" eval="[(4, ref('group_travel_chauffeur'))]"/>
+	</record>
+
+	<!-- ==================== MULTI-AGENCES ==================== -->
+	<!-- Société : un utilisateur ne voit que les agences de ses sociétés actives -->
+	<record id="rule_travel_agency_company" model="ir.rule">
+		<field name="name">Agence : multi-société</field>
+		<field name="model_id" ref="model_adk_travel_agency"/>
+		<field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+	</record>
+	<record id="rule_travel_booking_company" model="ir.rule">
+		<field name="name">Vente : multi-société</field>
+		<field name="model_id" ref="model_adk_travel_booking"/>
+		<field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+	</record>
+
+	<!-- Accès par agence : si l'agence a des utilisateurs autorisés, seuls eux la voient.
+	     Liste vide = agence ouverte à tous les utilisateurs du module.
+	     L'Administrateur Agence voit toutes les agences. -->
+	<record id="rule_travel_agency_user" model="ir.rule">
+		<field name="name">Agence : utilisateurs autorisés</field>
+		<field name="model_id" ref="model_adk_travel_agency"/>
+		<field name="domain_force">['|', ('user_ids', '=', False), ('user_ids', 'in', [user.id])]</field>
+		<field name="groups" eval="[(4, ref('group_travel_user')), (4, ref('group_travel_chauffeur')), (4, ref('group_traval_maintenance_user'))]"/>
+	</record>
+	<record id="rule_travel_agency_admin" model="ir.rule">
+		<field name="name">Agence : administrateur (toutes)</field>
+		<field name="model_id" ref="model_adk_travel_agency"/>
+		<field name="domain_force">[(1, '=', 1)]</field>
+		<field name="groups" eval="[(4, ref('group_travel_admin'))]"/>
+	</record>
+
+	<record id="rule_travel_employee_agency" model="ir.rule">
+		<field name="name">employee : accès par agence</field>
+		<field name="model_id" ref="model_adk_travel_employee"/>
+		<field name="domain_force">['|', ('agency_id.user_ids', '=', False), ('agency_id.user_ids', 'in', [user.id])]</field>
+		<field name="groups" eval="[(4, ref('group_travel_user')), (4, ref('group_travel_chauffeur')), (4, ref('group_traval_maintenance_user'))]"/>
+	</record>
+	<record id="rule_travel_employee_agency_admin" model="ir.rule">
+		<field name="name">employee : administrateur (toutes agences)</field>
+		<field name="model_id" ref="model_adk_travel_employee"/>
+		<field name="domain_force">[(1, '=', 1)]</field>
+		<field name="groups" eval="[(4, ref('group_travel_admin'))]"/>
+	</record>
+
+	<record id="rule_travel_vehicle_agency" model="ir.rule">
+		<field name="name">vehicle : accès par agence</field>
+		<field name="model_id" ref="model_adk_travel_vehicle"/>
+		<field name="domain_force">['|', ('agency_id.user_ids', '=', False), ('agency_id.user_ids', 'in', [user.id])]</field>
+		<field name="groups" eval="[(4, ref('group_travel_user')), (4, ref('group_travel_chauffeur')), (4, ref('group_traval_maintenance_user'))]"/>
+	</record>
+	<record id="rule_travel_vehicle_agency_admin" model="ir.rule">
+		<field name="name">vehicle : administrateur (toutes agences)</field>
+		<field name="model_id" ref="model_adk_travel_vehicle"/>
+		<field name="domain_force">[(1, '=', 1)]</field>
+		<field name="groups" eval="[(4, ref('group_travel_admin'))]"/>
+	</record>
+
+	<record id="rule_travel_vehicle_seat_agency" model="ir.rule">
+		<field name="name">vehicle_seat : accès par agence</field>
+		<field name="model_id" ref="model_adk_travel_vehicle_seat"/>
+		<field name="domain_force">['|', ('vehicle_id.agency_id.user_ids', '=', False), ('vehicle_id.agency_id.user_ids', 'in', [user.id])]</field>
+		<field name="groups" eval="[(4, ref('group_travel_user')), (4, ref('group_travel_chauffeur')), (4, ref('group_traval_maintenance_user'))]"/>
+	</record>
+	<record id="rule_travel_vehicle_seat_agency_admin" model="ir.rule">
+		<field name="name">vehicle_seat : administrateur (toutes agences)</field>
+		<field name="model_id" ref="model_adk_travel_vehicle_seat"/>
+		<field name="domain_force">[(1, '=', 1)]</field>
+		<field name="groups" eval="[(4, ref('group_travel_admin'))]"/>
+	</record>
+
+	<record id="rule_travel_trip_agency" model="ir.rule">
+		<field name="name">trip : accès par agence</field>
+		<field name="model_id" ref="model_adk_travel_trip"/>
+		<field name="domain_force">['|', ('agency_id.user_ids', '=', False), ('agency_id.user_ids', 'in', [user.id])]</field>
+		<field name="groups" eval="[(4, ref('group_travel_user'))]"/>
+	</record>
+	<record id="rule_travel_trip_agency_admin" model="ir.rule">
+		<field name="name">trip : administrateur (toutes agences)</field>
+		<field name="model_id" ref="model_adk_travel_trip"/>
+		<field name="domain_force">[(1, '=', 1)]</field>
+		<field name="groups" eval="[(4, ref('group_travel_admin'))]"/>
+	</record>
+
+	<record id="rule_travel_booking_agency" model="ir.rule">
+		<field name="name">booking : accès par agence</field>
+		<field name="model_id" ref="model_adk_travel_booking"/>
+		<field name="domain_force">['|', ('agency_id.user_ids', '=', False), ('agency_id.user_ids', 'in', [user.id])]</field>
+		<field name="groups" eval="[(4, ref('group_travel_user'))]"/>
+	</record>
+	<record id="rule_travel_booking_agency_admin" model="ir.rule">
+		<field name="name">booking : administrateur (toutes agences)</field>
+		<field name="model_id" ref="model_adk_travel_booking"/>
+		<field name="domain_force">[(1, '=', 1)]</field>
+		<field name="groups" eval="[(4, ref('group_travel_admin'))]"/>
+	</record>
+
+	<record id="rule_travel_booking_line_agency" model="ir.rule">
+		<field name="name">booking_line : accès par agence</field>
+		<field name="model_id" ref="model_adk_travel_booking_line"/>
+		<field name="domain_force">['|', ('agency_id.user_ids', '=', False), ('agency_id.user_ids', 'in', [user.id])]</field>
+		<field name="groups" eval="[(4, ref('group_travel_user'))]"/>
+	</record>
+	<record id="rule_travel_booking_line_agency_admin" model="ir.rule">
+		<field name="name">booking_line : administrateur (toutes agences)</field>
+		<field name="model_id" ref="model_adk_travel_booking_line"/>
+		<field name="domain_force">[(1, '=', 1)]</field>
+		<field name="groups" eval="[(4, ref('group_travel_admin'))]"/>
+	</record>
+
+	<record id="rule_travel_cash_closing_agency" model="ir.rule">
+		<field name="name">cash_closing : accès par agence</field>
+		<field name="model_id" ref="model_adk_travel_cash_closing"/>
+		<field name="domain_force">['|', ('agency_id.user_ids', '=', False), ('agency_id.user_ids', 'in', [user.id])]</field>
+		<field name="groups" eval="[(4, ref('group_travel_user'))]"/>
+	</record>
+	<record id="rule_travel_cash_closing_agency_admin" model="ir.rule">
+		<field name="name">cash_closing : administrateur (toutes agences)</field>
+		<field name="model_id" ref="model_adk_travel_cash_closing"/>
+		<field name="domain_force">[(1, '=', 1)]</field>
+		<field name="groups" eval="[(4, ref('group_travel_admin'))]"/>
+	</record>
+
+	<record id="rule_travel_traval_maintenance_agency" model="ir.rule">
+		<field name="name">traval_maintenance : accès par agence</field>
+		<field name="model_id" ref="model_adk_traval_maintenance"/>
+		<field name="domain_force">['|', ('agency_id.user_ids', '=', False), ('agency_id.user_ids', 'in', [user.id])]</field>
+		<field name="groups" eval="[(4, ref('group_travel_user')), (4, ref('group_traval_maintenance_user'))]"/>
+	</record>
+	<record id="rule_travel_traval_maintenance_agency_admin" model="ir.rule">
+		<field name="name">traval_maintenance : administrateur (toutes agences)</field>
+		<field name="model_id" ref="model_adk_traval_maintenance"/>
+		<field name="domain_force">[(1, '=', 1)]</field>
+		<field name="groups" eval="[(4, ref('group_travel_admin'))]"/>
+	</record>
+</odoo>

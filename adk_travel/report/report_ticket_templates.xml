@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="action_report_travel_ticket" model="ir.actions.report">
+		<field name="name">Billet de Voyage</field>
+		<field name="model">adk.travel.booking.line</field>
+		<field name="report_type">qweb-pdf</field>
+		<field name="report_name">adk_travel.report_travel_ticket_view</field>
+		<field name="report_file">adk_travel.report_travel_ticket_view</field>
+		<field name="print_report_name">'Billet_%s' % (object.ticket_ref)</field>
+		<field name="binding_model_id" ref="model_adk_travel_booking_line"/>
+		<field name="binding_type">report</field>
+	</record>
+
+	<template id="report_travel_ticket_view">
+		<t t-call="web.html_container">
+			<t t-foreach="docs" t-as="o">
+				<div class="article" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id">
+					<div class="page" style="font-family:'Helvetica',sans-serif; color:#222;">
+						<div style="border:2px dashed #333; border-radius:8px; padding:20px; page-break-inside: avoid; margin-bottom:15px;">
+							<t t-set="agency" t-value="o.booking_id.agency_id"/>
+							<t t-call="adk_travel.report_agency_header">
+								<t t-set="header_agency" t-value="agency"/>
+								<t t-set="header_name" t-value="agency.name"/>
+							</t>
+							<div class="row" style="padding-bottom:6px;">
+								<div class="col-8">
+									<h4 style="margin:0;">Billet de voyage</h4>
+								</div>
+								<div class="col-4 text-end">
+									<span class="badge badge-pill badge-dark" style="font-size:1.1em; padding:5px 15px;">
+										<span t-field="o.travel_class_id.name"/>
+									</span>
+								</div>
+							</div>
+
+							<div class="row mt-3">
+								<div class="col-8">
+									<p><strong>N° Billet :</strong> <span t-field="o.ticket_ref"/></p>
+									<p><strong>Passager :</strong> <span t-field="o.passenger_name"/></p>
+									<p><strong>Ligne :</strong> <span t-field="o.trip_id.line_id.name"/></p>
+									<p><strong>Véhicule :</strong> <span t-field="o.trip_id.vehicle_id.name"/> (<span t-field="o.trip_id.vehicle_id.matricule"/>)</p>
+									<p><strong>Départ :</strong> <span t-field="o.trip_id.departure_datetime"/></p>
+									<p><strong>Siège :</strong> <span t-field="o.seat_id.seat_number"/></p>
+									<p><strong>Bagages :</strong> <span t-field="o.baggage_count"/> pièce(s) — <span t-field="o.baggage_weight"/> kg</p>
+								</div>
+								<div class="col-4 text-center">
+									<img t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=110&amp;height=110' % o.ticket_ref" style="width:110px; height:110px;"/>
+								</div>
+							</div>
+
+							<div class="row mt-2" style="border-top:1px solid #ccc; padding-top:10px;">
+								<div class="col-6">
+									<strong>Tarif trajet :</strong> <span t-field="o.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+								</div>
+								<div class="col-6">
+									<strong>Supplément bagage :</strong> <span t-field="o.baggage_fee" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+								</div>
+							</div>
+							<div class="text-end mt-2">
+								<h4><strong>Total :</strong> <span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></h4>
+								<div class="small" t-if="o.booking_id.invoice_name">
+									Facture <span t-out="o.booking_id.invoice_name"/> —
+									<strong t-if="o.booking_id.payment_status in ('paid', 'in_payment')">PAYÉ</strong>
+									<strong t-elif="o.booking_id.payment_status == 'partial'">PARTIELLEMENT PAYÉ</strong>
+									<strong t-else="">À PAYER</strong>
+								</div>
+							</div>
+							<p class="text-muted small mt-2" t-if="agency.ticket_footer"><span t-out="agency.ticket_footer"/></p>
+						</div>
+					</div>
+				</div>
+			</t>
+		</t>
+	</template>
+</odoo>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="view_travel_agency_list" model="ir.ui.view">
+		<field name="name">adk.travel.agency.list</field>
+		<field name="model">adk.travel.agency</field>
+		<field name="arch" type="xml">
+			<list string="Agences">
+				<field name="sequence" widget="handle"/>
+				<field name="name"/>
+				<field name="code"/>
+				<field name="city"/>
+				<field name="phone"/>
+				<field name="manager_id"/>
+				<field name="company_id" groups="base.group_multi_company"/>
+			</list>
+		</field>
+	</record>
+
+	<record id="view_travel_agency_form" model="ir.ui.view">
+		<field name="name">adk.travel.agency.form</field>
+		<field name="model">adk.travel.agency</field>
+		<field name="arch" type="xml">
+			<form string="Agence">
+				<sheet>
+					<div class="oe_button_box" name="button_box">
+						<button name="action_view_employees" type="object" class="oe_stat_button" icon="fa-users">
+							<field name="employee_count" widget="statinfo" string="Équipe"/>
+						</button>
+						<button name="action_view_vehicles" type="object" class="oe_stat_button" icon="fa-bus">
+							<field name="vehicle_count" widget="statinfo" string="Véhicules"/>
+						</button>
+						<button name="action_view_trips" type="object" class="oe_stat_button" icon="fa-road">
+							<field name="trip_count" widget="statinfo" string="Voyages"/>
+						</button>
+						<button name="action_view_bookings" type="object" class="oe_stat_button" icon="fa-ticket">
+							<field name="booking_count" widget="statinfo" string="Ventes"/>
+						</button>
+					</div>
+					<widget name="web_ribbon" title="Archivée" bg_color="text-bg-danger" invisible="active"/>
+					<field name="logo" widget="image" class="oe_avatar"/>
+					<div class="oe_title">
+						<label for="name"/>
+						<h1><field name="name" placeholder="Nom de votre agence (ex : Agence de Douala)"/></h1>
+					</div>
+					<group>
+						<group string="Coordonnées (imprimées sur billets et rapports)">
+							<field name="street" placeholder="Adresse..."/>
+							<field name="street2"/>
+							<label for="zip" string="Ville"/>
+							<div class="d-flex gap-2">
+								<field name="zip" placeholder="Code postal" class="w-25"/>
+								<field name="city" placeholder="Ville"/>
+							</div>
+							<field name="state_id" options="{'no_create': True}"/>
+							<field name="country_id" options="{'no_create': True}"/>
+						</group>
+						<group string="Identité">
+							<field name="code"/>
+							<field name="phone"/>
+							<field name="email"/>
+							<field name="website"/>
+							<field name="registration_number"/>
+							<field name="manager_id" options="{'no_create': True}"/>
+							<field name="company_id" groups="base.group_multi_company"/>
+							<field name="active" invisible="1"/>
+						</group>
+					</group>
+					<notebook>
+						<page string="Facturation et encaissement" name="billing">
+							<group>
+								<group>
+									<field name="auto_register_payment"/>
+									<field name="sale_journal_id" options="{'no_create': True}"/>
+									<field name="default_payment_journal_id" options="{'no_create': True}"/>
+								</group>
+							</group>
+							<p class="text-muted">
+								À la confirmation d'une vente, une facture client Odoo est créée et validée.
+								Si « Encaisser à la confirmation » est coché, le paiement est enregistré dans le journal
+								lié au mode de paiement (Configuration &gt; Modes de paiement).
+							</p>
+						</page>
+						<page string="Billet" name="ticket">
+							<group>
+								<field name="ticket_footer" placeholder="Conditions affichées en bas de chaque billet..."/>
+							</group>
+						</page>
+						<page string="Accès" name="access">
+							<p class="text-muted">
+								Liste vide : tous les utilisateurs du module accèdent à cette agence.
+								Sinon, seuls les utilisateurs listés (et les Administrateurs Agence) voient ses données.
+							</p>
+							<field name="user_ids" widget="many2many_tags"/>
+						</page>
+					</notebook>
+				</sheet>
+				<chatter/>
+			</form>
+		</field>
+	</record>
+
+	<record id="view_travel_agency_search" model="ir.ui.view">
+		<field name="name">adk.travel.agency.search</field>
+		<field name="model">adk.travel.agency</field>
+		<field name="arch" type="xml">
+			<search>
+				<field name="name"/>
+				<field name="code"/>
+				<field name="city"/>
+				<filter string="Archivées" name="inactive" domain="[('active','=',False)]"/>
+			</search>
+		</field>
+	</record>
+
+	<record id="action_travel_agency" model="ir.actions.act_window">
+		<field name="name">Agences</field>
+		<field name="res_model">adk.travel.agency</field>
+		<field name="view_mode">list,form</field>
+		<field name="help" type="html">
+			<p class="o_view_nocontent_smiling_face">Enregistrez votre première agence</p>
+			<p>Le nom de l'agence apparaîtra sur les billets, les rapports et le tableau de bord. Vous pouvez gérer autant d'agences que nécessaire.</p>
+		</field>
+	</record>
+</odoo>

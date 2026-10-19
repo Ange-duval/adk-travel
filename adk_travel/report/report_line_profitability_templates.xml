@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="action_report_line_profitability" model="ir.actions.report">
+		<field name="name">Rapport de Rentabilité</field>
+		<field name="model">adk.travel.booking</field>
+		<field name="report_type">qweb-pdf</field>
+		<field name="report_name">adk_travel.report_line_profitability_view</field>
+		<field name="report_file">adk_travel.report_line_profitability_view</field>
+		<field name="print_report_name">'Rapport_Rentabilite_ADK_Travel'</field>
+	</record>
+
+	<template id="report_line_profitability_view">
+		<t t-call="web.html_container">
+			<div class="article">
+				<div class="page" style="font-family:'Helvetica',sans-serif; color:#222;">
+					<t t-call="adk_travel.report_agency_header">
+						<t t-set="header_agency" t-value="agency"/>
+						<t t-set="header_name" t-value="header_name"/>
+					</t>
+					<h3 style="text-align:center; font-weight:bold;">Rapport de Rentabilité</h3>
+					<p class="text-center text-muted">
+						Regroupement par : <strong t-esc="report_type_label"/> —
+						Période du <span t-esc="date_start"/> au <span t-esc="date_end"/>
+					</p>
+
+					<table class="table table-sm table-bordered mt-3">
+						<thead style="background-color:#f2f2f2;">
+							<tr>
+								<th>Regroupement</th>
+								<th class="text-end">Nb Passagers</th>
+								<th class="text-end">Montant Trajets</th>
+								<th class="text-end">Montant Bagages</th>
+								<th class="text-end">Total</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr t-foreach="grouped_data.items()" t-as="item">
+								<td t-esc="item[0]"/>
+								<td class="text-end" t-esc="item[1]['count']"/>
+								<td class="text-end" t-esc="'{:,.0f}'.format(item[1]['trip_amount'])"/>
+								<td class="text-end" t-esc="'{:,.0f}'.format(item[1]['baggage_amount'])"/>
+								<td class="text-end" t-esc="'{:,.0f}'.format(item[1]['total'])"/>
+							</tr>
+						</tbody>
+						<tfoot>
+							<tr style="font-weight:bold; background-color:#f2f2f2;">
+								<td colspan="4">TOTAL GÉNÉRAL</td>
+								<td class="text-end" t-esc="'{:,.0f}'.format(grand_total)"/>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+			</div>
+		</t>
+	</template>
+</odoo>
