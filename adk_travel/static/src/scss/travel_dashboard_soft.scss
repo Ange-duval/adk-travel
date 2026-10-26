@@ -1,0 +1,152 @@
+// ADK-AUDIT : tableau de bord doux et défilable
+.adk_tv {
+    --adk-bg: #f8f5fb;
+    --adk-card: #ffffff;
+    --adk-line: #eee7f3;
+    --adk-text: #4a4350;
+    --adk-muted: #9a91a3;
+    --adk-accent: #8f73a3;
+    --adk-mint: #7cc6a4;
+
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: linear-gradient(180deg, #f8f5fb 0%, #fbf9fd 60%, #ffffff 100%);
+    color: var(--adk-text);
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    scroll-behavior: smooth;
+
+    * { box-sizing: border-box; }
+
+    .adk_tv_inner { max-width: 1240px; margin: 0 auto; padding: 28px 30px 40px; }
+
+    .adk_head {
+        display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+        gap: 16px; margin-bottom: 26px;
+    }
+    .adk_title { margin: 0; font-size: 30px; font-weight: 600; color: #3a3340; letter-spacing: -.3px; }
+    .adk_sub { margin: 4px 0 0; color: var(--adk-muted); font-size: 14px; }
+    .adk_filters { display: flex; flex-wrap: wrap; gap: 10px; }
+    .adk_pills {
+        display: inline-flex; background: #fff; border: 1px solid var(--adk-line);
+        border-radius: 999px; padding: 4px; box-shadow: 0 4px 14px rgba(143,115,163,.07);
+    }
+    .adk_pill {
+        border: 0; background: transparent; color: var(--adk-muted); font-size: 13px; font-weight: 500;
+        padding: 6px 14px; border-radius: 999px; cursor: pointer; transition: all .2s ease;
+        &:hover { color: var(--adk-accent); }
+        &.on { background: #efe8f6; color: var(--adk-accent); font-weight: 600; }
+    }
+
+    .adk_click { cursor: pointer; transition: transform .2s ease, box-shadow .2s ease;
+        &:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(143,115,163,.14); } }
+
+    // ---- KPI ----
+    .adk_kpis { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 16px; margin-bottom: 18px; }
+    .adk_kpi {
+        background: var(--adk-card); border: 1px solid var(--adk-line); border-radius: 22px;
+        padding: 20px 20px 18px; box-shadow: 0 6px 20px rgba(143,115,163,.07);
+    }
+    .adk_hero { display: flex; align-items: center; gap: 16px;
+        background: linear-gradient(135deg, #f1eaf8 0%, #e7f4ee 100%); }
+    .adk_ring { width: 112px; height: 112px; flex: none; }
+    .adk_ring_bg { fill: none; stroke: #ebe3f1; stroke-width: 13; }
+    .adk_hero .adk_ring_bg { stroke: rgba(255,255,255,.75); }
+    .adk_ring_fg { fill: none; stroke: var(--adk-mint); stroke-width: 13; stroke-linecap: round; transition: stroke-dasharray .8s ease; }
+    .adk_ring_txt { font-size: 25px; font-weight: 600; fill: #3a3340; }
+    .adk_kpi_icon { width: 40px; height: 40px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 12px; }
+    .adk_kpi_val { font-size: 32px; font-weight: 600; color: #3a3340; line-height: 1.1; }
+    .adk_kpi_label { font-size: 14px; font-weight: 600; color: var(--adk-text); margin-top: 4px; }
+    .adk_kpi_note { font-size: 12.5px; color: var(--adk-muted); margin-top: 3px; }
+
+    // ---- Grilles & cartes ----
+    .adk_grid { display: grid; gap: 16px; margin-bottom: 18px; }
+    .adk_g2 { grid-template-columns: 1.35fr 1fr; }
+    .adk_g3 { grid-template-columns: repeat(3, 1fr); }
+    .adk_card {
+        background: var(--adk-card); border: 1px solid var(--adk-line); border-radius: 22px;
+        padding: 22px 24px; box-shadow: 0 6px 20px rgba(143,115,163,.07);
+    }
+    .adk_wide { margin-bottom: 18px; }
+    .adk_card_t { margin: 0; font-size: 17px; font-weight: 600; color: #3a3340; }
+    .adk_card_s { margin: 3px 0 16px; font-size: 13px; color: var(--adk-muted); }
+    .adk_empty { color: var(--adk-muted); font-size: 14px; padding: 18px 0; text-align: center; }
+
+    // ---- Graphique ----
+    .adk_chart { width: 100%; height: auto; display: block; }
+    .adk_grid_line { stroke: #f0eaf5; stroke-width: 1; stroke-dasharray: 4 5; }
+    .adk_axis { font-size: 11.5px; fill: var(--adk-muted); }
+    .adk_val { font-size: 12px; fill: #8a7a99; font-weight: 600; }
+    .adk_bar { fill: #d9cbe6; }
+    .adk_line { fill: none; stroke: var(--adk-mint); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .adk_dot { fill: #fff; stroke: var(--adk-mint); stroke-width: 3; }
+    .adk_legend { display: flex; gap: 18px; justify-content: center; font-size: 12.5px; color: var(--adk-muted); margin-top: 6px;
+        i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; } }
+
+    // ---- Barres par service ----
+    .adk_rows { display: flex; flex-direction: column; gap: 16px; }
+    .adk_row_h { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; b { color: #3a3340; } }
+    .adk_track { height: 11px; border-radius: 999px; background: #f1ecf6; overflow: hidden; }
+    .adk_fill { height: 100%; border-radius: 999px; transition: width .8s ease; }
+    .adk_row_n { font-size: 12px; color: var(--adk-muted); margin-top: 4px; }
+
+    // ---- Donuts ----
+    .adk_donut_wrap { display: flex; align-items: center; gap: 18px; margin-top: 14px; }
+    .adk_donut { width: 132px; height: 132px; flex: none; }
+    .adk_seg { fill: none; stroke-width: 13; stroke-linecap: butt; transition: all .6s ease; }
+    .adk_dn { font-size: 26px; font-weight: 600; fill: #3a3340; }
+    .adk_dl { font-size: 11px; fill: var(--adk-muted); }
+    .adk_ul { list-style: none; margin: 0; padding: 0; flex: 1; display: flex; flex-direction: column; gap: 10px;
+        li { display: flex; align-items: center; gap: 9px; font-size: 13.5px;
+            i { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+            span { flex: 1; color: var(--adk-text); } b { color: #3a3340; } } }
+
+    // ---- Listes ----
+    .adk_item {
+        display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin: 0 -14px;
+        border-radius: 16px; transition: background .2s ease;
+        &:hover { background: #faf7fc; transform: none; box-shadow: none; }
+    }
+    .adk_item_main { flex: 1; min-width: 0; }
+    .adk_item_t { font-size: 14.5px; font-weight: 500; color: #3a3340; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .adk_item_s { font-size: 12.5px; color: var(--adk-muted); margin-top: 3px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .adk_tag { background: #f1ecf6; color: var(--adk-accent); border-radius: 8px; padding: 1px 8px; font-weight: 500; }
+    .adk_item_side { display: flex; align-items: center; gap: 10px; flex: none; b { font-size: 13px; color: #3a3340; min-width: 44px; text-align: right; } }
+    .adk_mini { width: 84px; height: 8px; border-radius: 999px; background: #f1ecf6; overflow: hidden; }
+    .adk_mini_f { height: 100%; border-radius: 999px; }
+    .adk_dot_c { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+    .adk_chip { font-size: 12px; font-weight: 600; border-radius: 999px; padding: 4px 12px; flex: none; }
+    .adk_chip_r { background: #fdecec; color: #d97676; }
+    .adk_chip_o { background: #fff2e0; color: #d8924a; }
+    .adk_chip_b { background: #e8f2fb; color: #5a9bcc; }
+
+    // ---- Tableau auditeurs ----
+    .adk_table { display: flex; flex-direction: column; }
+    .adk_tr { display: grid; grid-template-columns: 2.2fr 1.3fr 1fr 1fr 1.5fr; align-items: center; gap: 10px;
+        padding: 13px 8px; border-bottom: 1px solid #f3eef7; font-size: 14px;
+        &:last-child { border-bottom: 0; } }
+    .adk_th { color: var(--adk-muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .6px; }
+    .adk_who { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+    .adk_avatar { width: 34px; height: 34px; border-radius: 50%; background: #efe8f6; color: var(--adk-accent);
+        display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+    .adk_rate_cell { display: flex; align-items: center; gap: 10px; b { min-width: 46px; } }
+
+    .adk_foot { text-align: center; color: #b9b0c2; font-size: 12.5px; margin-top: 26px; }
+
+    @media (max-width: 1100px) {
+        .adk_kpis { grid-template-columns: repeat(2, 1fr); }
+        .adk_hero { grid-column: 1 / -1; }
+        .adk_g2, .adk_g3 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+        .adk_tv_inner { padding: 18px 14px 30px; }
+        .adk_kpis { grid-template-columns: 1fr; }
+        .adk_tr { grid-template-columns: 1.6fr 1fr 1fr; > div:nth-child(4), > div:nth-child(5) { display: none; } }
+    }
+}
+
+.adk_tv .adk_sel { margin-bottom: 22px; display: flex; flex-wrap: wrap; gap: 8px; }
+.adk_tv .adk_sel .adk_pill { background: #fff; border: 1px solid var(--adk-line); box-shadow: 0 3px 10px rgba(143,115,163,.06); }
+.adk_tv .adk_sel .adk_pill.on { background: #efe8f6; border-color: #dccbea; }
+.adk_tv .adk_amt { font-weight: 600; color: #3a3340; white-space: nowrap; }
+.adk_tv .adk_live { background: #fff2e0; color: #d8924a; border-radius: 8px; padding: 1px 8px; font-weight: 600; }

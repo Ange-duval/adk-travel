@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="view_travel_dashboard_form" model="ir.ui.view">
+		<field name="name">adk.travel.dashboard.form</field>
+		<field name="model">adk.travel.dashboard</field>
+		<field name="arch" type="xml">
+			<form string="Tableau de Bord">
+				<div class="o_form_statusbar" style="justify-content:space-between; border:none;">
+					<widget name="travel_dashboard_autorefresh"/>
+					<button name="action_refresh" type="object" string="Actualiser" icon="fa-refresh" class="btn-secondary"/>
+				</div>
+				<sheet>
+					<div class="oe_title text-center mb-4">
+						<h1 style="font-weight:700;"><i class="fa fa-dashboard text-primary me-2" title="Indicateur"/><field name="title" readonly="1" nolabel="1"/></h1>
+						<p class="text-muted">Vue d'ensemble en temps réel de votre agence de voyage</p>
+						<div class="d-flex justify-content-center align-items-center gap-2 mt-2"><span class="text-muted">Agence :</span><field name="agency_id" nolabel="1" options="{'no_create': True, 'no_open': True}" placeholder="Toutes les agences"/></div>
+					</div>
+
+					<!-- ==================== FLASH DU JOUR ==================== -->
+					<h5 class="text-uppercase text-muted mt-3 mb-2" style="letter-spacing:1px;"><i class="fa fa-bolt me-2" title="Indicateur"/>Vue d'Ensemble Flash</h5>
+					<div class="row g-3">
+						<div class="col-3">
+							<div class="card border-0 shadow-sm h-100" style="background:linear-gradient(135deg,#1cc88a 0%,#169b6b 100%); color:white;">
+								<div class="card-body text-center py-4">
+									<i class="fa fa-money fa-2x mb-2" style="opacity:0.85;" title="Indicateur"/>
+									<h2 class="mb-0"><field name="revenue_today" readonly="1" nolabel="1" widget="monetary"/></h2>
+									<span style="opacity:0.9;">Recettes du jour</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-3">
+							<div class="card border-0 shadow-sm h-100" style="background:linear-gradient(135deg,#4e73df 0%,#3654b0 100%); color:white;">
+								<div class="card-body text-center py-4">
+									<i class="fa fa-users fa-2x mb-2" style="opacity:0.85;" title="Indicateur"/>
+									<h2 class="mb-0"><field name="passengers_today" readonly="1" nolabel="1"/></h2>
+									<span style="opacity:0.9;">Passagers actifs</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-3">
+							<div class="card border-0 shadow-sm h-100" style="background:linear-gradient(135deg,#f6c23e 0%,#dda520 100%); color:white;">
+								<div class="card-body text-center py-4">
+									<i class="fa fa-bus fa-2x mb-2" style="opacity:0.85;" title="Indicateur"/>
+									<h2 class="mb-0"><field name="trips_in_progress" readonly="1" nolabel="1"/></h2>
+									<span style="opacity:0.9;">Bus en route</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-3">
+							<div class="card border-0 shadow-sm h-100" style="background:linear-gradient(135deg,#e74a3b 0%,#c0392b 100%); color:white;">
+								<div class="card-body text-center py-4">
+									<i class="fa fa-ticket fa-2x mb-2" style="opacity:0.85;" title="Indicateur"/>
+									<h2 class="mb-0"><field name="bookings_today" readonly="1" nolabel="1"/></h2>
+									<span style="opacity:0.9;">Billets vendus aujourd'hui</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- ==================== FLOTTE ==================== -->
+					<h5 class="text-uppercase text-muted mt-4 mb-2" style="letter-spacing:1px;"><i class="fa fa-truck me-2" title="Indicateur"/>Statut de la Flotte</h5>
+					<div class="row g-3">
+						<div class="col-3">
+							<div class="card border-0 shadow-sm h-100 bg-light">
+								<div class="card-body text-center py-4">
+									<i class="fa fa-car fa-2x mb-2 text-secondary" title="Indicateur"/>
+									<h2 class="mb-0"><field name="count_vehicles" readonly="1" nolabel="1"/></h2>
+									<span class="text-muted">Total véhicules</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-3">
+							<div class="card border-0 shadow-sm h-100 bg-light">
+								<div class="card-body text-center py-4">
+									<i class="fa fa-check-circle fa-2x mb-2 text-success" title="Indicateur"/>
+									<h2 class="mb-0"><field name="count_vehicles_available" readonly="1" nolabel="1"/></h2>
+									<span class="text-muted">Disponibles</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-3">
+							<div class="card border-0 shadow-sm h-100 bg-light">
+								<div class="card-body text-center py-4">
+									<i class="fa fa-road fa-2x mb-2 text-primary" title="Indicateur"/>
+									<h2 class="mb-0"><field name="count_vehicles_en_route" readonly="1" nolabel="1"/></h2>
+									<span class="text-muted">En route</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-3">
+							<div class="card border-0 shadow-sm h-100 bg-light">
+								<div class="card-body text-center py-4">
+									<i class="fa fa-wrench fa-2x mb-2 text-danger" title="Indicateur"/>
+									<h2 class="mb-0"><field name="count_vehicles_panne" readonly="1" nolabel="1"/></h2>
+									<span class="text-muted">En panne / maintenance</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- ==================== ÉQUIPE & VOYAGES ==================== -->
+					<h5 class="text-uppercase text-muted mt-4 mb-2" style="letter-spacing:1px;"><i class="fa fa-id-badge me-2" title="Indicateur"/>Équipe &amp; Voyages du Jour</h5>
+					<div class="row g-3">
+						<div class="col-3">
+							<div class="card border-0 shadow-sm h-100 bg-light">
+								<div class="card-body text-center py-4">
+									<i class="fa fa-user fa-2x mb-2 text-secondary" title="Indicateur"/>
+									<h2 class="mb-0"><field name="count_employees" readonly="1" nolabel="1"/></h2>
+									<span class="text-muted">Employés</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-3">
+							<div class="card border-0 shadow-sm h-100 bg-light">
+								<div class="card-body text-center py-4">
+									<i class="fa fa-steering-wheel fa-2x mb-2 text-secondary" title="Indicateur"/>
+									<h2 class="mb-0"><field name="count_chauffeurs" readonly="1" nolabel="1"/></h2>
+									<span class="text-muted">Chauffeurs</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-3">
+							<div class="card border-0 shadow-sm h-100 bg-light">
+								<div class="card-body text-center py-4">
+									<i class="fa fa-desktop fa-2x mb-2 text-secondary" title="Indicateur"/>
+									<h2 class="mb-0"><field name="count_trips_today" readonly="1" nolabel="1"/></h2>
+									<span class="text-muted">Voyages du jour</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-3">
+							<div class="card border-0 shadow-sm h-100 bg-light">
+								<div class="card-body text-center py-4">
+									<i class="fa fa-line-chart fa-2x mb-2 text-secondary" title="Indicateur"/>
+									<h2 class="mb-0"><field name="avg_fill_rate_today" readonly="1" nolabel="1" widget="percentage"/></h2>
+									<span class="text-muted">Taux remplissage moyen</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- ==================== FINANCE MENSUELLE ==================== -->
+					<h5 class="text-uppercase text-muted mt-4 mb-2" style="letter-spacing:1px;"><i class="fa fa-bar-chart me-2" title="Indicateur"/>Finance du Mois</h5>
+					<div class="row g-3">
+						<div class="col-4">
+							<div class="card border-0 shadow-sm h-100" style="background:linear-gradient(135deg,#36b9cc 0%,#258391 100%); color:white;">
+								<div class="card-body text-center py-4">
+									<i class="fa fa-money fa-2x mb-2" style="opacity:0.85;" title="Indicateur"/>
+									<h2 class="mb-0"><field name="revenue_month" readonly="1" nolabel="1" widget="monetary"/></h2>
+									<span style="opacity:0.9;">Recettes du mois</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-4">
+							<div class="card border-0 shadow-sm h-100" style="background:linear-gradient(135deg,#858796 0%,#5a5c69 100%); color:white;">
+								<div class="card-body text-center py-4">
+									<i class="fa fa-ticket fa-2x mb-2" style="opacity:0.85;" title="Indicateur"/>
+									<h2 class="mb-0"><field name="count_bookings_month" readonly="1" nolabel="1"/></h2>
+									<span style="opacity:0.9;">Ventes du mois</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-4">
+							<div class="card border-0 shadow-sm h-100" style="background:linear-gradient(135deg,#e74a3b 0%,#c0392b 100%); color:white;">
+								<div class="card-body text-center py-4">
+									<i class="fa fa-exclamation-circle fa-2x mb-2" style="opacity:0.85;" title="Indicateur"/>
+									<h2 class="mb-0"><field name="amount_unpaid" readonly="1" nolabel="1" widget="monetary"/></h2>
+									<span style="opacity:0.9;">Factures à encaisser</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="mt-4 text-center">
+						<button name="action_view_vehicles_available" type="object" string="Voir les véhicules disponibles" class="btn-secondary me-2"/>
+						<button name="action_view_trips_today" type="object" string="Voir les voyages du jour" class="btn-secondary"/>
+					</div>
+				</sheet>
+			</form>
+		</field>
+	</record>
+
+	<record id="action_travel_dashboard" model="ir.actions.server">
+		<field name="name">Tableau de Bord</field>
+		<field name="model_id" ref="model_adk_travel_dashboard"/>
+		<field name="state">code</field>
+		<field name="code">action = model.action_open_dashboard()</field>
+	</record>
+</odoo>

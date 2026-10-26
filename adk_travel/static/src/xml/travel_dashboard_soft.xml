@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="adk_travel.SoftDashboard">
+  <div class="adk_tv">
+    <div class="adk_tv_inner">
+
+      <header class="adk_head">
+        <div>
+          <h1 class="adk_title">Tableau de bord Travel</h1>
+          <p class="adk_sub">Ventes, voyages, flotte et caisse de vos agences en un coup d'œil<t t-if="state.data"> · mis à jour le <t t-esc="state.data.today"/></t></p>
+        </div>
+        <div class="adk_filters">
+          <div class="adk_pills">
+            <t t-foreach="periods" t-as="p" t-key="p.key">
+              <button type="button" t-attf-class="adk_pill {{ state.period === p.key ? 'on' : '' }}" t-on-click="() => this.setPeriod(p.key)"><t t-esc="p.label"/></button>
+            </t>
+          </div>
+        </div>
+      </header>
+
+      <t t-if="state.data">
+        <t t-set="k" t-value="state.data.kpis"/>
+
+        <div class="adk_sel" t-if="state.data.agencies_all.length > 1">
+          <button type="button" t-attf-class="adk_pill {{ !state.agency ? 'on' : '' }}" t-on-click="() => this.setAgency(0)">Toutes les agences</button>
+          <t t-foreach="state.data.agencies_all" t-as="ag" t-key="ag.id">
+            <button type="button" t-attf-class="adk_pill {{ state.agency === ag.id ? 'on' : '' }}" t-on-click="() => this.setAgency(ag.id)"><t t-esc="ag.name"/></button>
+          </t>
+        </div>
+
+        <!-- ===== Indicateurs clés ===== -->
+        <section class="adk_kpis">
+          <div class="adk_kpi adk_hero">
+            <svg viewBox="0 0 130 130" class="adk_ring">
+              <circle cx="65" cy="65" r="54" class="adk_ring_bg"/>
+              <circle cx="65" cy="65" r="54" class="adk_ring_fg" t-att-stroke-dasharray="ringDash" transform="rotate(-90 65 65)"/>
+              <text x="65" y="70" text-anchor="middle" class="adk_ring_txt"><t t-esc="k.fill"/>%</text>
+            </svg>
+            <div>
+              <div class="adk_kpi_label">Taux de remplissage</div>
+              <div class="adk_kpi_note">moyenne de <t t-esc="k.trips"/> voyages</div>
+            </div>
+          </div>
+          <div class="adk_kpi adk_click" t-on-click="() => this.openSales('Ventes')">
+            <div class="adk_kpi_icon" style="background:#e8f2fb;color:#5a9bcc;"><i class="fa fa-money"/></div>
+            <div class="adk_kpi_val"><t t-esc="short(k.revenue)"/></div>
+            <div class="adk_kpi_label">Recettes</div>
+            <div class="adk_kpi_note"><t t-esc="money(k.revenue)"/></div>
+          </div>
+          <div class="adk_kpi adk_click" t-on-click="() => this.openSales('Ventes')">
+            <div class="adk_kpi_icon" style="background:#efe8f6;color:#8f73a3;"><i class="fa fa-ticket"/></div>
+            <div class="adk_kpi_val"><t t-esc="k.tickets"/></div>
+            <div class="adk_kpi_label">Billets vendus</div>
+            <div class="adk_kpi_note"><t t-esc="k.bookings"/> ventes · <t t-esc="short(k.avg_ticket)"/> en moyenne</div>
+          </div>
+          <div class="adk_kpi adk_click" t-on-click="() => this.openTrips('Voyages')">
+            <div class="adk_kpi_icon" style="background:#e8f5ee;color:#5fae88;"><i class="fa fa-bus"/></div>
+            <div class="adk_kpi_val"><t t-esc="k.trips"/></div>
+            <div class="adk_kpi_label">Voyages</div>
+            <div class="adk_kpi_note"><t t-esc="k.trips_running"/> en route · <t t-esc="k.trips_upcoming"/> à venir</div>
+          </div>
+          <div class="adk_kpi adk_click" t-on-click="openDue">
+            <div class="adk_kpi_icon" style="background:#fff3e6;color:#e5a463;"><i class="fa fa-hourglass-half"/></div>
+            <div class="adk_kpi_val"><t t-esc="short(k.due)"/></div>
+            <div class="adk_kpi_label">À encaisser</div>
+            <div class="adk_kpi_note"><t t-esc="k.due_count"/> vente<t t-if="k.due_count > 1">s</t> non soldée<t t-if="k.due_count > 1">s</t></div>
+          </div>
+        </section>
+
+        <!-- ===== Évolution + lignes ===== -->
+        <section class="adk_grid adk_g2">
+          <div class="adk_card">
+            <h3 class="adk_card_t">Activité sur 6 mois</h3>
+            <p class="adk_card_s">Billets vendus (barres) et recettes (courbe)</p>
+            <t t-set="c" t-value="chart"/>
+            <svg t-att-viewBox="'0 0 ' + c.W + ' ' + c.H" class="adk_chart">
+              <line x1="20" t-att-x2="c.W - 12" t-att-y1="c.base" t-att-y2="c.base" class="adk_grid_line"/>
+              <t t-foreach="c.bars" t-as="b" t-key="b_index">
+                <rect t-att-x="b.x" t-att-y="b.y" t-att-width="b.w" t-att-height="b.h" rx="8" class="adk_bar"/>
+                <text t-att-x="b.cx" t-att-y="c.H - 12" text-anchor="middle" class="adk_axis"><t t-esc="b.label"/></text>
+                <text t-if="b.value" t-att-x="b.cx" t-att-y="c.base - b.h - 6" text-anchor="middle" class="adk_val"><t t-esc="b.value"/></text>
+              </t>
+              <polyline t-if="c.drawn.length > 1" t-att-points="c.line" class="adk_line"/>
+              <t t-foreach="c.drawn" t-as="p" t-key="p_index">
+                <circle t-att-cx="p.x" t-att-cy="p.y" r="5" class="adk_dot"/>
+                <text t-att-x="p.x" t-att-y="p.y - 11" text-anchor="middle" class="adk_val" style="fill:#4f9d7c;"><t t-esc="p.label"/></text>
+              </t>
+            </svg>
+            <div class="adk_legend">
+              <span><i style="background:#d9cbe6"/> Billets vendus</span>
+              <span><i style="background:#7cc6a4"/> Recettes</span>
+            </div>
+          </div>
+
+          <div class="adk_card">
+            <h3 class="adk_card_t">Recettes par ligne</h3>
+            <p class="adk_card_s">Les lignes les plus rentables</p>
+            <t t-if="state.data.by_line.length">
+              <div class="adk_rows">
+                <t t-foreach="state.data.by_line" t-as="s" t-key="s.name">
+                  <div class="adk_row">
+                    <div class="adk_row_h"><span><t t-esc="s.name"/></span><b><t t-esc="short(s.revenue)"/></b></div>
+                    <div class="adk_track"><div class="adk_fill" t-att-style="'width:' + (s.revenue / state.data.by_line[0].revenue * 100) + '%;background:#8ec1e6'"/></div>
+                    <div class="adk_row_n"><t t-esc="s.tickets"/> billet<t t-if="s.tickets > 1">s</t> · <t t-esc="money(s.revenue)"/></div>
+                  </div>
+                </t>
+              </div>
+            </t>
+            <div t-else="" class="adk_empty">Aucune vente sur la période.</div>
+          </div>
+        </section>
+
+        <!-- ===== 3 répartitions ===== -->
+        <section class="adk_grid adk_g3">
+          <div class="adk_card adk_click" t-on-click="() => this.openSales('Ventes')">
+            <h3 class="adk_card_t">Classes de voyage</h3>
+            <div class="adk_donut_wrap">
+              <svg viewBox="0 0 130 130" class="adk_donut">
+                <circle cx="65" cy="65" r="54" class="adk_ring_bg"/>
+                <t t-foreach="classDonut" t-as="d" t-key="d_index">
+                  <circle t-if="d.value" cx="65" cy="65" r="54" class="adk_seg" t-att-stroke="d.color" t-att-stroke-dasharray="d.dash" t-att-stroke-dashoffset="d.offset" transform="rotate(-90 65 65)"/>
+                </t>
+                <text x="65" y="63" text-anchor="middle" class="adk_dn"><t t-esc="k.tickets"/></text>
+                <text x="65" y="80" text-anchor="middle" class="adk_dl">billets</text>
+              </svg>
+              <ul class="adk_ul">
+                <t t-foreach="classDonut" t-as="d" t-key="d_index">
+                  <li><i t-att-style="'background:' + d.color"/><span><t t-esc="d.label"/></span><b><t t-esc="d.value"/></b></li>
+                </t>
+              </ul>
+            </div>
+          </div>
+          <div class="adk_card adk_click" t-on-click="() => this.openSales('Ventes')">
+            <h3 class="adk_card_t">Modes de paiement</h3>
+            <div class="adk_donut_wrap">
+              <svg viewBox="0 0 130 130" class="adk_donut">
+                <circle cx="65" cy="65" r="54" class="adk_ring_bg"/>
+                <t t-foreach="methodDonut" t-as="d" t-key="d_index">
+                  <circle t-if="d.value" cx="65" cy="65" r="54" class="adk_seg" t-att-stroke="d.color" t-att-stroke-dasharray="d.dash" t-att-stroke-dashoffset="d.offset" transform="rotate(-90 65 65)"/>
+                </t>
+                <text x="65" y="63" text-anchor="middle" class="adk_dn"><t t-esc="k.bookings"/></text>
+                <text x="65" y="80" text-anchor="middle" class="adk_dl">ventes</text>
+              </svg>
+              <ul class="adk_ul">
+                <t t-foreach="methodDonut" t-as="d" t-key="d_index">
+                  <li><i t-att-style="'background:' + d.color"/><span><t t-esc="d.label"/></span><b><t t-esc="d.value"/></b></li>
+                </t>
+              </ul>
+            </div>
+          </div>
+          <div class="adk_card adk_click" t-on-click="openFleet">
+            <h3 class="adk_card_t">État de la flotte</h3>
+            <div class="adk_donut_wrap">
+              <svg viewBox="0 0 130 130" class="adk_donut">
+                <circle cx="65" cy="65" r="54" class="adk_ring_bg"/>
+                <t t-foreach="fleetDonut" t-as="d" t-key="d_index">
+                  <circle t-if="d.value" cx="65" cy="65" r="54" class="adk_seg" t-att-stroke="d.color" t-att-stroke-dasharray="d.dash" t-att-stroke-dashoffset="d.offset" transform="rotate(-90 65 65)"/>
+                </t>
+                <text x="65" y="63" text-anchor="middle" class="adk_dn"><t t-esc="k.vehicles_available"/>/<t t-esc="k.vehicles"/></text>
+                <text x="65" y="80" text-anchor="middle" class="adk_dl">disponibles</text>
+              </svg>
+              <ul class="adk_ul">
+                <t t-foreach="fleetDonut" t-as="d" t-key="d_index">
+                  <li><i t-att-style="'background:' + d.color"/><span><t t-esc="d.label"/></span><b><t t-esc="d.value"/></b></li>
+                </t>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== Départs + points d'attention ===== -->
+        <section class="adk_grid adk_g2">
+          <div class="adk_card">
+            <h3 class="adk_card_t">Prochains départs</h3>
+            <p class="adk_card_s">Voyages confirmés et en route · remplissage en temps réel</p>
+            <t t-if="state.data.upcoming.length">
+              <t t-foreach="state.data.upcoming" t-as="t" t-key="t.id">
+                <div class="adk_item adk_click" t-on-click="() => this.openRecord('adk.travel.trip', t.id)">
+                  <div class="adk_dot_c" t-att-style="'background:' + (t.running ? '#f2c48c' : '#8ec1e6')"/>
+                  <div class="adk_item_main">
+                    <div class="adk_item_t"><t t-esc="t.line"/> <span t-if="t.running" class="adk_live">en route</span></div>
+                    <div class="adk_item_s"><span class="adk_tag"><t t-esc="t.when"/></span><span><t t-esc="t.vehicle"/></span><span t-if="state.data.agencies_all.length > 1 and !state.agency"><t t-esc="t.agency"/></span></div>
+                  </div>
+                  <div class="adk_item_side">
+                    <div class="adk_mini"><div class="adk_mini_f" t-att-style="'width:' + t.fill + '%;background:' + fillColor(t.fill)"/></div>
+                    <b><t t-esc="t.booked"/>/<t t-esc="t.capacity"/></b>
+                  </div>
+                </div>
+              </t>
+            </t>
+            <div t-else="" class="adk_empty">Aucun départ programmé.</div>
+          </div>
+
+          <div class="adk_card">
+            <h3 class="adk_card_t">Points d'attention</h3>
+            <p class="adk_card_s">Ventes à encaisser et interventions de maintenance</p>
+            <t t-foreach="state.data.maintenance" t-as="r" t-key="r.id">
+              <div class="adk_item adk_click" t-on-click="() => this.openRecord('adk.traval.maintenance', r.id)">
+                <div class="adk_dot_c" t-att-style="'background:' + (r.panne ? '#ee9a9a' : '#f2c48c')"/>
+                <div class="adk_item_main">
+                  <div class="adk_item_t"><t t-esc="r.vehicle"/> · <t t-esc="r.type"/></div>
+                  <div class="adk_item_s"><span><t t-esc="r.issue"/></span></div>
+                </div>
+                <div t-att-class="'adk_chip ' + (r.panne ? 'adk_chip_r' : 'adk_chip_o')"><t t-esc="r.state"/></div>
+              </div>
+            </t>
+            <t t-foreach="state.data.due_list" t-as="b" t-key="b.id">
+              <div class="adk_item adk_click" t-on-click="() => this.openRecord('adk.travel.booking', b.id)">
+                <div class="adk_dot_c" style="background:#8ec1e6;"/>
+                <div class="adk_item_main">
+                  <div class="adk_item_t"><t t-esc="b.who"/></div>
+                  <div class="adk_item_s"><span class="adk_tag"><t t-esc="b.name"/></span><span><t t-esc="b.agency"/></span></div>
+                </div>
+                <div class="adk_item_side"><span class="adk_amt"><t t-esc="money(b.amount)"/></span></div>
+              </div>
+            </t>
+            <div t-if="!state.data.maintenance.length and !state.data.due_list.length" class="adk_empty">Rien à signaler 🎉</div>
+          </div>
+        </section>
+
+        <!-- ===== Voyages ===== -->
+        <section class="adk_grid adk_g2">
+          
+          <div class="adk_card adk_click" t-on-click="() => this.openTrips('Voyages')">
+            <h3 class="adk_card_t">Voyages par statut</h3>
+            <div class="adk_donut_wrap">
+              <svg viewBox="0 0 130 130" class="adk_donut">
+                <circle cx="65" cy="65" r="54" class="adk_ring_bg"/>
+                <t t-foreach="tripDonut" t-as="d" t-key="d_index">
+                  <circle t-if="d.value" cx="65" cy="65" r="54" class="adk_seg" t-att-stroke="d.color" t-att-stroke-dasharray="d.dash" t-att-stroke-dashoffset="d.offset" transform="rotate(-90 65 65)"/>
+                </t>
+                <text x="65" y="63" text-anchor="middle" class="adk_dn"><t t-esc="k.trips"/></text>
+                <text x="65" y="80" text-anchor="middle" class="adk_dl">voyages</text>
+              </svg>
+              <ul class="adk_ul">
+                <t t-foreach="tripDonut" t-as="d" t-key="d_index">
+                  <li><i t-att-style="'background:' + d.color"/><span><t t-esc="d.label"/></span><b><t t-esc="d.value"/></b></li>
+                </t>
+              </ul>
+            </div>
+          </div>
+          <div class="adk_card">
+            <h3 class="adk_card_t">Pilotage de la flotte</h3>
+            <p class="adk_card_s">Disponibilité des véhicules et de l'équipe</p>
+            <div class="adk_rows">
+              <div class="adk_row"><div class="adk_row_h"><span>Véhicules disponibles</span><b><t t-esc="k.vehicles_available"/> / <t t-esc="k.vehicles"/></b></div>
+                <div class="adk_track"><div class="adk_fill" t-att-style="'width:' + (k.vehicles ? k.vehicles_available / k.vehicles * 100 : 0) + '%;background:#9ccfb4'"/></div></div>
+              <div class="adk_row"><div class="adk_row_h"><span>Voyages terminés</span><b><t t-esc="k.trips_done"/> / <t t-esc="k.trips"/></b></div>
+                <div class="adk_track"><div class="adk_fill" t-att-style="'width:' + (k.trips ? k.trips_done / k.trips * 100 : 0) + '%;background:#8ec1e6'"/></div></div>
+              <div class="adk_row"><div class="adk_row_h"><span>Ventes aujourd'hui</span><b><t t-esc="k.tickets_today"/> billet<t t-if="k.tickets_today > 1">s</t></b></div>
+                <div class="adk_row_n">Recettes du jour : <t t-esc="money(k.revenue_today)"/></div></div>
+              <div class="adk_row"><div class="adk_row_h"><span>Équipe</span><b><t t-esc="k.employees"/> personne<t t-if="k.employees > 1">s</t></b></div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== Agences ===== -->
+        <section class="adk_card adk_wide" t-if="state.data.agency_rows.length > 1 or !state.agency">
+          <h3 class="adk_card_t">Performance par agence</h3>
+          <p class="adk_card_s">Recettes, billets, voyages et remplissage moyen</p>
+          <div class="adk_table">
+            <div class="adk_tr adk_th"><div>Agence</div><div>Recettes</div><div>Billets</div><div>Voyages</div><div>Remplissage</div></div>
+            <t t-foreach="state.data.agency_rows" t-as="a" t-key="a.id">
+              <div class="adk_tr adk_click" t-on-click="() => this.openRecord('adk.travel.agency', a.id)">
+                <div class="adk_who"><span class="adk_avatar"><t t-esc="initials(a.name)"/></span><span><t t-esc="a.name"/><span t-if="a.city" style="display:block;font-size:12px;color:#9a91a3;"><t t-esc="a.city"/></span></span></div>
+                <div class="adk_amt"><t t-esc="money(a.revenue)"/></div>
+                <div><t t-esc="a.tickets"/></div>
+                <div><t t-esc="a.trips"/></div>
+                <div class="adk_rate_cell"><div class="adk_mini"><div class="adk_mini_f" t-att-style="'width:' + a.fill + '%;background:' + fillColor(a.fill)"/></div><b><t t-esc="a.fill"/>%</b></div>
+              </div>
+            </t>
+          </div>
+        </section>
+
+        <!-- ===== Guichets ===== -->
+        <section class="adk_card adk_wide">
+          <h3 class="adk_card_t">Travail des guichetières et guichetiers</h3>
+          <p class="adk_card_s">Ventes réalisées et écart de caisse cumulé sur les clôtures validées</p>
+          <div class="adk_table">
+            <div class="adk_tr adk_th"><div>Guichetier</div><div>Recettes</div><div>Ventes</div><div>Billets</div><div>Écart de caisse</div></div>
+            <t t-foreach="state.data.sellers" t-as="u" t-key="u.name">
+              <div class="adk_tr">
+                <div class="adk_who"><span class="adk_avatar"><t t-esc="initials(u.name)"/></span><span><t t-esc="u.name"/><span style="display:block;font-size:12px;color:#9a91a3;"><t t-esc="u.agency"/></span></span></div>
+                <div class="adk_amt"><t t-esc="money(u.revenue)"/></div>
+                <div><t t-esc="u.bookings"/></div>
+                <div><t t-esc="u.tickets"/></div>
+                <div><b t-att-style="'color:' + diffColor(u.diff)"><t t-esc="money(u.diff)"/></b><span style="color:#9a91a3;font-size:12px;"> · <t t-esc="u.closings"/> clôture<t t-if="u.closings > 1">s</t></span></div>
+              </div>
+            </t>
+            <div t-if="!state.data.sellers.length" class="adk_empty">Aucune vente sur la période.</div>
+          </div>
+        </section>
+
+        <div class="adk_foot">ADK Agency Travel · tableau de bord en temps réel</div>
+      </t>
+      <div t-else="" class="adk_empty">Chargement…</div>
+    </div>
+  </div>
+</t>
+
+</templates>
