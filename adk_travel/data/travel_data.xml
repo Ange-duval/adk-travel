@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data noupdate="1">
+		<!-- Types de véhicule -->
+		<record id="vehicle_type_car" model="adk.travel.vehicle.type">
+			<field name="name">Gros Car</field>
+			<field name="code">CAR</field>
+		</record>
+		<record id="vehicle_type_bus" model="adk.travel.vehicle.type">
+			<field name="name">Bus</field>
+			<field name="code">BUS</field>
+		</record>
+		<record id="vehicle_type_voiture" model="adk.travel.vehicle.type">
+			<field name="name">Voiture</field>
+			<field name="code">VOIT</field>
+		</record>
+
+		<!-- Classes de voyage -->
+		<record id="travel_class_eco" model="adk.travel.class">
+			<field name="name">Classe Éco</field>
+			<field name="code">ECO</field>
+			<field name="sequence">10</field>
+			<field name="base_price">5000</field>
+			<field name="baggage_free_kg">20</field>
+			<field name="baggage_price_per_kg">300</field>
+			<field name="baggage_price_per_extra_item">1000</field>
+		</record>
+		<record id="travel_class_vip" model="adk.travel.class">
+			<field name="name">VIP</field>
+			<field name="code">VIP</field>
+			<field name="sequence">20</field>
+			<field name="base_price">10000</field>
+			<field name="baggage_free_kg">30</field>
+			<field name="baggage_price_per_kg">300</field>
+			<field name="baggage_price_per_extra_item">1500</field>
+		</record>
+
+		<!-- Modes de paiement -->
+		<record id="payment_method_cash" model="adk.travel.payment.method">
+			<field name="name">Espèces</field>
+		</record>
+		<record id="payment_method_om" model="adk.travel.payment.method">
+			<field name="name">Orange Money</field>
+		</record>
+		<record id="payment_method_momo" model="adk.travel.payment.method">
+			<field name="name">MTN Mobile Money</field>
+		</record>
+		<record id="payment_method_card" model="adk.travel.payment.method">
+			<field name="name">Carte bancaire</field>
+		</record>
+	</data>
+</odoo>

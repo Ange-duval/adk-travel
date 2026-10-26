@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<!-- ========================================================== -->
+	<!-- MENU RACINE -->
+	<!-- ========================================================== -->
+	<menuitem id="menu_travel_root" name="ADK AGENCY TRAVEL" web_icon="adk_travel,static/description/icon.png" sequence="1"/>
+
+	<!-- 1. Menus Principaux -->
+	<menuitem id="menu_travel_agencies" name="Agences" parent="menu_travel_root" action="action_travel_agency" sequence="3" groups="adk_travel.group_travel_manager"/>
+	<menuitem id="menu_travel_soft_dashboard" name="Vue d'ensemble" parent="menu_travel_root" action="action_travel_soft_dashboard" sequence="1"/>
+	<menuitem id="menu_travel_dashboard" name="Tableau détaillé" parent="menu_travel_root" action="action_travel_dashboard" sequence="5"/>
+	<menuitem id="menu_travel_guichet" name="Guichet / Ventes" parent="menu_travel_root" action="action_travel_booking" sequence="10"/>
+	<menuitem id="menu_travel_trips" name="Voyages" parent="menu_travel_root" action="action_travel_trip" sequence="20"/>
+	<menuitem id="menu_travel_vehicles" name="Flotte / Véhicules" parent="menu_travel_root" action="action_travel_vehicle" sequence="30"/>
+	<menuitem id="menu_travel_employees" name="Équipe" parent="menu_travel_root" action="action_travel_employee" sequence="40"/>
+
+	<!-- 2. Menu Caisse -->
+	<menuitem id="menu_travel_cash" name="Caisse" parent="menu_travel_root" sequence="60"/>
+	<menuitem id="menu_travel_cash_closing" name="Clôtures de Caisse" parent="menu_travel_cash" action="action_travel_cash_closing" sequence="10"/>
+
+	<!-- 2bis. Menu Maintenance -->
+	<menuitem id="menu_travel_maintenance" name="Maintenance Flotte" parent="menu_travel_root" action="action_traval_maintenance" sequence="65"/>
+
+	<!-- 3. Menu Rapports -->
+	<menuitem id="menu_travel_reports" name="Rapports" parent="menu_travel_root" sequence="70"/>
+	<menuitem id="menu_travel_report_wizard" name="Rapport Périodique (Ligne / Classe / Véhicule)" parent="menu_travel_reports" action="action_travel_report_wizard" sequence="10"/>
+
+	<!-- 4. Menu Configuration -->
+	<menuitem id="menu_travel_config" name="Paramétrage" parent="menu_travel_root" sequence="100"/>
+	<menuitem id="menu_travel_config_lines" name="Lignes / Destinations" parent="menu_travel_config" action="action_travel_line" sequence="10"/>
+	<menuitem id="menu_travel_config_classes" name="Classes de voyage" parent="menu_travel_config" action="action_travel_class" sequence="20"/>
+	<menuitem id="menu_travel_config_vehicle_types" name="Types de véhicule" parent="menu_travel_config" action="action_travel_vehicle_type" sequence="25"/>
+	<menuitem id="menu_travel_config_payment" name="Modes de paiement" parent="menu_travel_config" action="action_travel_payment_method" sequence="30"/>
+</odoo>

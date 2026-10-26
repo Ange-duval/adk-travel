@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="adk_travel.DashboardAutoRefresh">
+        <div class="d-inline-flex align-items-center text-muted small">
+            <i class="fa fa-refresh me-1" t-att-class="state.refreshing ? 'fa-spin' : ''"/>
+            <span>Actualisation auto (30s) — Dernière : <t t-esc="state.lastRefresh.toLocaleTimeString()"/></span>
+        </div>
+    </t>
+</templates>

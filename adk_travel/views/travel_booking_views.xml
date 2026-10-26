@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="view_travel_booking_list" model="ir.ui.view">
+		<field name="name">adk.travel.booking.list</field>
+		<field name="model">adk.travel.booking</field>
+		<field name="arch" type="xml">
+			<list string="Ventes / Réservations" decoration-muted="state == 'cancelled'" decoration-success="state == 'confirmed'">
+				<field name="name"/>
+				<field name="agency_id"/>
+				<field name="booking_date"/>
+				<field name="client_name"/>
+				<field name="trip_id"/>
+				<field name="guichetier_id"/>
+				<field name="passenger_count"/>
+				<field name="amount_total" sum="Total"/>
+				<field name="payment_method_id"/>
+				<field name="payment_status" widget="badge" optional="show"/>
+				<field name="state" widget="badge"/>
+			</list>
+		</field>
+	</record>
+
+	<record id="view_travel_booking_form" model="ir.ui.view">
+		<field name="name">adk.travel.booking.form</field>
+		<field name="model">adk.travel.booking</field>
+		<field name="arch" type="xml">
+			<form string="Vente au Guichet">
+				<header>
+					<button name="action_confirm" string="Confirmer la vente" type="object" class="btn-primary" invisible="state != 'draft'"
+						confirm="La vente va être confirmée : une facture sera générée et, si l'agence encaisse au comptant, le paiement sera enregistré."/>
+					<button name="action_print_tickets" string="Imprimer les Billets" type="object" class="btn-secondary" icon="fa-print" invisible="state != 'confirmed'"/>
+					<button name="action_recompute_prices" string="Recalculer les Tarifs" type="object" class="btn-secondary" icon="fa-refresh"/>
+					<button name="action_cancel" string="Annuler" type="object" invisible="state == 'cancelled'"/>
+					<field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
+				</header>
+				<sheet>
+					<div class="oe_button_box" name="button_box">
+						<button name="action_view_invoice" type="object" class="oe_stat_button" icon="fa-file-text-o"
+							invisible="not invoice_id" groups="adk_travel.group_travel_manager">
+							<div class="o_stat_info">
+								<span class="o_stat_text">Facture</span>
+								<span class="o_stat_value"><field name="invoice_name"/></span>
+							</div>
+						</button>
+					</div>
+					<widget name="web_ribbon" title="Payé" bg_color="text-bg-success" invisible="payment_status not in ('paid', 'in_payment')"/>
+					<widget name="web_ribbon" title="Partiel" bg_color="text-bg-warning" invisible="payment_status != 'partial'"/>
+					<div class="oe_title">
+						<h1><field name="name" readonly="1"/></h1>
+					</div>
+					<group>
+						<group string="Client">
+							<field name="client_name"/>
+							<field name="client_phone"/>
+							<field name="partner_id" options="{'no_create_edit': False}"/>
+						</group>
+						<group string="Trajet">
+							<field name="agency_id" options="{'no_create': True}" readonly="state != 'draft'"/>
+							<field name="trip_id" readonly="state != 'draft'"/>
+							<field name="line_id" readonly="1"/>
+							<field name="vehicle_id" readonly="1"/>
+							<field name="booking_date"/>
+						</group>
+					</group>
+					<group>
+						<group string="Vente">
+							<field name="guichetier_id"/>
+							<field name="payment_method_id" readonly="state != 'draft'"/>
+							<field name="payment_status" invisible="not invoice_id"/>
+						</group>
+						<group string="Montants">
+							<field name="amount_trip"/>
+							<field name="amount_baggage"/>
+							<field name="amount_total" class="fw-bold"/>
+							<field name="amount_paid" invisible="not invoice_id"/>
+							<field name="invoice_residual" invisible="not invoice_id"/>
+						</group>
+					</group>
+					<notebook>
+						<page string="Passagers (Achat Multi-Places)">
+							<field name="passenger_line_ids">
+								<list editable="bottom">
+									<field name="passenger_name"/>
+									<field name="travel_class_id"/>
+									<field name="seat_id" domain="[('vehicle_id','=',parent.vehicle_id)]"/>
+									<field name="price_unit"/>
+									<field name="baggage_count"/>
+									<field name="baggage_weight"/>
+									<field name="baggage_fee"/>
+									<field name="amount_total"/>
+									<field name="ticket_ref" readonly="1"/>
+									<field name="state" widget="badge"/>
+								</list>
+							</field>
+						</page>
+						<page string="Observations">
+							<field name="notes"/>
+						</page>
+					</notebook>
+				</sheet>
+				<chatter/>
+			</form>
+		</field>
+	</record>
+
+	<record id="view_travel_booking_search" model="ir.ui.view">
+		<field name="name">adk.travel.booking.search</field>
+		<field name="model">adk.travel.booking</field>
+		<field name="arch" type="xml">
+			<search>
+				<field name="name"/>
+				<field name="client_name"/>
+				<field name="trip_id"/>
+				<field name="guichetier_id"/>
+				<field name="agency_id"/>
+				<filter string="Aujourd'hui" name="filter_today" domain="[('booking_date','&gt;=', context_today().strftime('%Y-%m-%d')), ('booking_date','&lt;', (context_today()+relativedelta(days=1)).strftime('%Y-%m-%d'))]"/>
+				<filter string="Confirmées" name="filter_confirmed" domain="[('state','=','confirmed')]"/>
+				<filter string="À encaisser" name="filter_unpaid" domain="[('state','=','confirmed'),('payment_status','in',('not_paid','partial'))]"/>
+				<filter string="Brouillons" name="filter_draft" domain="[('state','=','draft')]"/>
+				<group expand="0" string="Regrouper par">
+					<filter string="Agence" name="groupby_agency" context="{'group_by':'agency_id'}"/>
+					<filter string="Guichetière" name="groupby_guichetier" context="{'group_by':'guichetier_id'}"/>
+					<filter string="Ligne" name="groupby_line" context="{'group_by':'line_id'}"/>
+					<filter string="Mode de paiement" name="groupby_payment" context="{'group_by':'payment_method_id'}"/>
+					<filter string="Date" name="groupby_date" context="{'group_by':'booking_date:day'}"/>
+				</group>
+			</search>
+		</field>
+	</record>
+
+	<record id="action_travel_booking" model="ir.actions.act_window">
+		<field name="name">Guichet / Ventes</field>
+		<field name="res_model">adk.travel.booking</field>
+		<field name="view_mode">list,form</field>
+		<field name="context">{'search_default_filter_today': 1}</field>
+	</record>
+
+	<record id="action_server_travel_booking_recompute_prices" model="ir.actions.server">
+		<field name="name">Recalculer les tarifs manquants</field>
+		<field name="model_id" ref="model_adk_travel_booking"/>
+		<field name="binding_model_id" ref="model_adk_travel_booking"/>
+		<field name="binding_view_types">list,form</field>
+		<field name="state">code</field>
+		<field name="code">action = records.action_recompute_prices()</field>
+	</record>
+</odoo>

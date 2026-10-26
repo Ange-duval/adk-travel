@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="view_travel_vehicle_list" model="ir.ui.view">
+		<field name="name">adk.travel.vehicle.list</field>
+		<field name="model">adk.travel.vehicle</field>
+		<field name="arch" type="xml">
+			<list string="Flotte" decoration-success="state == 'available'" decoration-info="state == 'en_route'" decoration-danger="state == 'panne'" decoration-warning="state == 'maintenance'">
+				<field name="matricule"/>
+				<field name="name"/>
+				<field name="vehicle_type"/>
+				<field name="capacity"/>
+				<field name="driver_id"/>
+				<field name="state" widget="badge"/>
+			</list>
+		</field>
+	</record>
+
+	<record id="view_travel_vehicle_kanban" model="ir.ui.view">
+		<field name="name">adk.travel.vehicle.kanban</field>
+		<field name="model">adk.travel.vehicle</field>
+		<field name="arch" type="xml">
+			<kanban class="o_kanban_small_column" default_group_by="state">
+				<field name="name"/>
+				<field name="matricule"/>
+				<field name="state"/>
+				<field name="capacity"/>
+				<field name="vehicle_type"/>
+				<templates>
+					<t t-name="card">
+						<div class="p-2">
+							<strong><field name="name"/></strong>
+							<div class="text-muted"><field name="matricule"/> — <field name="vehicle_type"/></div>
+							<div><i class="fa fa-users me-1" title="Icône"/><field name="capacity"/> places</div>
+						</div>
+					</t>
+				</templates>
+			</kanban>
+		</field>
+	</record>
+
+	<record id="view_travel_vehicle_form" model="ir.ui.view">
+		<field name="name">adk.travel.vehicle.form</field>
+		<field name="model">adk.travel.vehicle</field>
+		<field name="arch" type="xml">
+			<form string="Véhicule">
+				<header>
+					<button name="action_set_available" string="Marquer Disponible" type="object" class="btn-success" invisible="state == 'available'"/>
+					<button name="action_set_en_route" string="Marquer En Route" type="object" class="btn-primary" invisible="state == 'en_route'"/>
+					<button name="action_set_panne" string="Signaler Panne" type="object" class="btn-danger" invisible="state == 'panne'"/>
+					<field name="state" widget="statusbar" statusbar_visible="available,en_route,panne,maintenance"/>
+				</header>
+				<sheet>
+					<div class="oe_button_box" name="button_box">
+						<button name="action_view_trips" type="object" class="oe_stat_button" icon="fa-road">
+							<field name="trip_count" widget="statinfo" string="Voyages"/>
+						</button>
+						<button name="action_view_seats" type="object" class="oe_stat_button" icon="fa-chair">
+							<field name="seat_count" widget="statinfo" string="Sièges"/>
+						</button>
+					</div>
+					<field name="image" widget="image" class="oe_avatar"/>
+					<div class="oe_title">
+						<h1><field name="name" placeholder="Ex: Car VIP 01"/></h1>
+					</div>
+					<group>
+						<group>
+							<field name="agency_id" options="{'no_create': True}"/>
+							<field name="matricule"/>
+							<field name="vehicle_type"/>
+							<field name="capacity"/>
+							<field name="driver_id"/>
+						</group>
+						<group>
+							<field name="brand"/>
+							<field name="model"/>
+							<field name="year"/>
+							<field name="active"/>
+						</group>
+					</group>
+					<notebook>
+						<page string="Plan de Places">
+							<button name="action_generate_seats" string="Générer le plan de places" type="object" class="btn-secondary mb-2" icon="fa-magic"/>
+							<field name="seat_ids">
+								<list editable="bottom">
+									<field name="seat_number"/>
+									<field name="sequence" widget="handle"/>
+									<field name="active"/>
+								</list>
+							</field>
+						</page>
+						<page string="Observations">
+							<field name="notes"/>
+						</page>
+					</notebook>
+				</sheet>
+				<chatter/>
+			</form>
+		</field>
+	</record>
+
+	<record id="view_travel_vehicle_search" model="ir.ui.view">
+		<field name="name">adk.travel.vehicle.search</field>
+		<field name="model">adk.travel.vehicle</field>
+		<field name="arch" type="xml">
+			<search>
+				<field name="name"/>
+				<field name="matricule"/>
+				<filter string="Disponible" name="filter_available" domain="[('state','=','available')]"/>
+				<filter string="En route" name="filter_en_route" domain="[('state','=','en_route')]"/>
+				<filter string="En panne" name="filter_panne" domain="[('state','=','panne')]"/>
+				<group expand="0" string="Regrouper par">
+					<filter string="Agence" name="groupby_agency" context="{'group_by':'agency_id'}"/>
+					<filter string="Statut" name="groupby_state" context="{'group_by':'state'}"/>
+					<filter string="Type" name="groupby_type" context="{'group_by':'vehicle_type'}"/>
+				</group>
+			</search>
+		</field>
+	</record>
+
+	<record id="action_travel_vehicle" model="ir.actions.act_window">
+		<field name="name">Flotte / Véhicules</field>
+		<field name="res_model">adk.travel.vehicle</field>
+		<field name="view_mode">kanban,list,form</field>
+	</record>
+</odoo>
